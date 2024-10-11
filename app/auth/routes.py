@@ -1,13 +1,13 @@
 from flask import Blueprint, request, jsonify
 from app import db
-from app.models import User
+from app.models import Student
 
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    user = User.query.filter_by(username=data['username']).first()
+    user = Student.query.filter_by(username=data['username']).first()
     
     if user and user.check_password(data['password']):
         token = user.get_token()
@@ -17,7 +17,7 @@ def login():
 @auth_bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    user = User(username=data['username'], role=data['role'])
+    user = Student(username=data['username'], role=data['role'])
     user.set_password(data['password'])
     
     db.session.add(user)

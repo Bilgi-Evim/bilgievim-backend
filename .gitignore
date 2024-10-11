@@ -1,0 +1,48 @@
+# Python bytecode files
+__pycache__/
+*.py[cod]
+
+# Environment variables
+.env
+
+# Flask instance folder
+instance/
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# IDE or editor specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+
+# MacOS specific files
+.DS_Store
+
+# Logs
+*.log
+
+# Coverage reports
+coverage/
+*.cover
+
+# Database files
+*.sqlite3
+*.db
+
+# Jupyter Notebook files
+.ipynb_checkpoints/
+
+# Other
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/

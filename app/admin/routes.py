@@ -1,6 +1,6 @@
 from flask import jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.models import User
+from app.models import Admin
 from . import admin_bp
 from app import db
 
@@ -9,7 +9,7 @@ from app import db
 @jwt_required()
 def admin_dashboard():
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = Admin.query.get(user_id)
 
     if user.role != 'admin':
         return jsonify({'error': 'Unauthorized'}), 403
@@ -21,13 +21,13 @@ def admin_dashboard():
 @jwt_required()
 def get_users():
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = Admin.query.get(user_id)
 
     if user.role != 'admin':
         return jsonify({'error': 'Unauthorized'}), 403
 
     # Tüm kullanıcıları listele
-    users = User.query.all()
+    users = Admin.query.all()
     users_list = [{"id": u.id, "username": u.username, "role": u.role} for u in users]
 
     return jsonify(users_list), 200
@@ -37,12 +37,12 @@ def get_users():
 @jwt_required()
 def delete_user(user_id):
     user_id_admin = get_jwt_identity()
-    admin_user = User.query.get(user_id_admin)
+    admin_user = Admin.query.get(user_id_admin)
 
     if admin_user.role != 'admin':
         return jsonify({'error': 'Unauthorized'}), 403
 
-    user_to_delete = User.query.get(user_id)
+    user_to_delete = Admin.query.get(user_id)
     if not user_to_delete:
         return jsonify({'error': 'User not found'}), 404
 

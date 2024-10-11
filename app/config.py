@@ -1,13 +1,18 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class Config:
-    SECRET_KEY = os.getenv("SECRET_KEY", "your_secret_key")
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite:///db.sqlite")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your_jwt_secret")
+    SECRET_KEY = os.getenv('SECRET_KEY')
 
 class DevelopmentConfig(Config):
-    DEBUG = True
+    DB_USERNAME = os.getenv('DB_USERNAME')
+    DB_PASSWORD = os.getenv('DB_PASSWORD')
+    DB_SERVER = os.getenv('DB_SERVER')
+    DB_NAME = os.getenv('DB_NAME')
 
-class ProductionConfig(Config):
-    DEBUG = False
+    SQLALCHEMY_DATABASE_URI = (
+        f'mssql+pyodbc://{DB_USERNAME}:{DB_PASSWORD}@{DB_SERVER}/{DB_NAME}?driver=ODBC+Driver+17+for+SQL+Server'
+    )
