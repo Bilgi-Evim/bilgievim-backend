@@ -1,0 +1,298 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "title": "Bilgi Evim API",
+      "description": "Bilgi Evim Dershane Sistemi API",
+      "version": "1.0.0"
+    },
+    "host": "127.0.0.1:5000",
+    "basePath": "/api",
+    "schemes": [
+      "http"
+    ],
+    "paths": {
+      "/student/register": {
+        "post": {
+          "summary": "Register a new student",
+          "description": "Registers a new student in the system",
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "Student data",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "lastname": {
+                    "type": "string"
+                  },
+                  "tc": {
+                    "type": "string"
+                  },
+                  "school_number": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "grade": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "Student registered successfully"
+            },
+            "400": {
+              "description": "Bad request"
+            }
+          }
+        }
+      },
+      "/login/student": {
+        "post": {
+          "summary": "Login as a student",
+          "description": "Logs in a student and returns an access token",
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "Student login credentials",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tc": {
+                    "type": "string"
+                  },
+                  "school_number": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Login successful",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "access_token": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Invalid credentials"
+            }
+          }
+        }
+      },
+      "/register/teacher": {
+        "post": {
+          "summary": "Register a new teacher",
+          "description": "Registers a new teacher in the system",
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "Teacher data",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "lastname": {
+                    "type": "string"
+                  },
+                  "tc": {
+                    "type": "string"
+                  },
+                  "teacher_number": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "subject": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "Teacher registered successfully"
+            },
+            "400": {
+              "description": "Bad request"
+            }
+          }
+        }
+      },
+      "/login/teacher": {
+        "post": {
+          "summary": "Login as a teacher",
+          "description": "Logs in a teacher and returns a success message",
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "Teacher login credentials",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tc": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Login successful",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string"
+                  },
+                  "username": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Invalid credentials"
+            }
+          }
+        }
+      },
+      "/login/admin": {
+        "post": {
+          "summary": "Login as an admin",
+          "description": "Logs in an admin and returns a success message",
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "Admin login credentials",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Login successful",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string"
+                  },
+                  "username": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Invalid credentials"
+            }
+          }
+        }
+      },
+      "/user/{user_id}": {
+        "delete": {
+          "summary": "Delete a user",
+          "description": "Deletes a user by ID (Admin only)",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "user_id",
+              "description": "ID of the user to delete",
+              "required": true,
+              "type": "integer"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "User deleted successfully"
+            },
+            "404": {
+              "description": "User not found"
+            },
+            "403": {
+              "description": "Unauthorized"
+            }
+          }
+        }
+      },
+      "/users": {
+        "get": {
+          "summary": "Get all users",
+          "description": "Retrieves a list of all users (Admin only)",
+          "responses": {
+            "200": {
+              "description": "User list retrieved successfully",
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "username": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Unauthorized"
+            }
+          }
+        }
+      }
+    }
+  }
+  
