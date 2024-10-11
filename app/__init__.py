@@ -7,9 +7,9 @@ db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
+    
     app.config.from_object('app.config.DevelopmentConfig')
     
-    # Veritabanı ve JWT işlemleri
     db.init_app(app)
     jwt = JWTManager(app)
     
@@ -25,4 +25,5 @@ def create_app():
     app.register_blueprint(teacher_bp, url_prefix='/teacher')
     app.register_blueprint(student_bp, url_prefix='/student')
     app.register_blueprint(admin_bp, url_prefix='/admin') 
+    
     return app

@@ -1,26 +1,25 @@
-from flask import Blueprint, request, jsonify
-from app import db
-from app.models import Student
+from flask import jsonify, request
+from flask_jwt_extended import create_access_token
+from app.models import Teacher, Student, Admin
+from . import auth_bp
 
-auth_bp = Blueprint('auth', __name__)
-
+# Login işlemi
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    user = Student.query.filter_by(username=data['username']).first()
-    
-    if user and user.check_password(data['password']):
-        token = user.get_token()
-        return jsonify({'token': token, 'role': user.role}), 200
-    return jsonify({'error': 'Invalid credentials'}), 401
+    username = data.get('username')
+    password = data.get('password')
 
-@auth_bp.route('/register', methods=['POST'])
-def register():
-    data = request.get_json()
-    user = Student(username=data['username'], role=data['role'])
-    user.set_password(data['password'])
+    user = Student.query.filter_by(username=username).first()
+
+    if not user:
+        user = Teacher.query.filter_by(username=username).first()
+    if not user:
+        user = Admin.query.filter_by(username=username).first()
+
+    if not user or not user.password == password:
+        return jsonify({'error': 'Invalid credentials'}), 401
+
+    access_token = create_access_token(identity=user.id)
     
-    db.session.add(user)
-    db.session.commit()
-    
-    return jsonify({'message': 'User registered successfully'}), 201
+    return jsonify({'access_token': access_token, 'role': user.role}), 200
