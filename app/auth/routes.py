@@ -48,7 +48,7 @@ def register_student():
 
     return {"message": "Student registered successfully"}, 201
 
-
+# Öğretmen kayıt işlemi
 @auth_bp.route('/register/teacher', methods=['POST'])
 def register_teacher():
     data = request.get_json()
@@ -74,7 +74,7 @@ def register_teacher():
 
     return {"message": "Teacher registered successfully"}, 201
 
-
+# Öğretmen giriş işlemi
 @auth_bp.route('/login/teacher', methods=['POST'])
 def login_teacher():
     data = request.get_json()
@@ -86,3 +86,17 @@ def login_teacher():
         return {"error": "Invalid credentials"}, 401
 
     return {"message": "Login successful", "username": teacher.username}, 200
+
+
+# Admin Giriş
+@auth_bp.route('/login/admin', methods=['POST'])
+def login_admin():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    admin = Admin.query.filter_by(username=username).first()
+    if not admin or not check_password_hash(admin.password, password):
+        return {"error": "Invalid credentials"}, 401
+
+    return {"message": "Login successful", "username": admin.username}, 200
