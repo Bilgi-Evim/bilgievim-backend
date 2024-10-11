@@ -1,6 +1,6 @@
 from flask import jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.models import User
+from app.models import Teacher
 from . import teacher_bp
 
 # Öğretmen Dashboard
@@ -8,7 +8,7 @@ from . import teacher_bp
 @jwt_required()
 def teacher_dashboard():
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = Teacher.query.get(user_id)
     
     if user.role != 'teacher':
         return jsonify({'error': 'Unauthorized'}), 403
@@ -20,7 +20,7 @@ def teacher_dashboard():
 @jwt_required()
 def teacher_profile():
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = Teacher.query.get(user_id)
 
     if user.role != 'teacher':
         return jsonify({'error': 'Unauthorized'}), 403
@@ -35,12 +35,12 @@ def teacher_profile():
 @jwt_required()
 def get_students():
     user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user = Teacher.query.get(user_id)
 
     if user.role != 'teacher':
         return jsonify({'error': 'Unauthorized'}), 403
 
-    students = User.query.filter_by(role='student').all()
+    students = Teacher.query.filter_by(role='student').all()
     students_list = [{"id": student.id, "username": student.username} for student in students]
 
     return jsonify(students_list), 200
