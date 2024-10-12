@@ -13,14 +13,14 @@ def studentLogin():
     school_number = data.get('school_number')
     password = data.get('password')
 
-    user = Student.query.filter_by(tc=tc).first()
+    student = Student.query.filter_by(tc=tc).first()
 
-    if not user or not user.password == password or not user.school_number == school_number:
+    if not student or not student.password == password or not student.school_number == school_number:
         return jsonify({'error': 'Invalid credentials'}), 401
 
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=student.id)
     
-    return jsonify({'access_token': access_token, 'role': user.role}), 200
+    return jsonify({'access_token': access_token, 'role': student.role}), 200
 
 # Öğrenci Kayıt İşlemi    
 @auth_bp.route('/register/student', methods=['POST'])
@@ -59,8 +59,10 @@ def login_teacher():
     teacher = Teacher.query.filter_by(tc=tc).first()
     if not teacher or not check_password_hash(teacher.password, password):
         return {"error": "Invalid credentials"}, 401
+    
+    access_token = create_access_token(identity=teacher.id)
 
-    return {"message": "Login successful", "username": teacher.username}, 200
+    return {"message": "Login successful",'access_token': access_token ,"username": teacher.username}, 200
 
 
 # Admin Giriş
@@ -74,4 +76,6 @@ def login_admin():
     if not admin or not check_password_hash(admin.password, password):
         return {"error": "Invalid credentials"}, 401
 
-    return {"message": "Login successful", "username": admin.username}, 200
+    access_token = create_access_token(identity=admin.id)
+
+    return {"message": "Login successful", "access_token":access_token ,"username": admin.username}, 200
