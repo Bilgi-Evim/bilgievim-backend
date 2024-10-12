@@ -5,6 +5,7 @@ from . import admin_bp
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import Teacher
+from app.models import Student
 
 # Admin Dashboard
 @admin_bp.route('/dashboard', methods=['GET'])
@@ -18,41 +19,168 @@ def admin_dashboard():
 
     return jsonify({'message': 'Admin dashboard'}), 200
 
-# Kullanıcı Listesini Getir (Admin için)
-@admin_bp.route('/students', methods=['GET'])
-@jwt_required()
-def get_users():
+# Admin Bilgi Güncelleme
+@admin_bp.route("/<int:admin_id>", mehods=["UPDATE"])
+@jwt_required
+def admin_update(admin_id):
     user_id = get_jwt_identity()
-    user = Admin.query.get(user_id)
+    admin = Admin.query.get(user_id)
+    
+    if admin.role != "admin":
+        return jsonify({'error':'Unauthorized'}), 403
 
-    if user.role != 'admin':
+    data = request.get_json()
+   
+    admin.username = data.get('username', admin.username)
+    admin.password = data.get('password', admin.password)
+    
+    if data.get('password'):
+        admin.password = generate_password_hash(data['password'])
+
+    db.session.commit()
+
+    return jsonify({'message': 'Admin profile updated successfully', 'admin': {
+        'id': admin.id,
+        'username': admin.username,
+        'role': admin.role
+    }}), 200
+
+# Tüm öğrencileri getir
+@admin_bp.route("/student-list", methods=["GET"])
+@jwt_required()
+def get_students():
+    user_id = get_jwt_identity()
+    admin_user = Admin.query.get(user_id)
+    
+    if admin_user.role != "admin":
+        return jsonify({'error':'Unauthorized'}), 403
+    
+    students = Student.query.all()
+    student_list = [{"id": s.id, "username":s.username, "lastname":s.lastname, "school_number":s.school_number,"tc":s.tc, "grade":s.grade} for s in students]
+    
+    return jsonify(student_list), 200
+
+# Öğrenci Profili Güncelleme
+@admin_bp.route("/student/<int:student_id>",methods=["UPDATE"])
+@jwt_required()
+def update_student(student_id):
+    user_id = get_jwt_identity()
+    admin_user = Admin.query.get(user_id)
+    
+    if admin_user.role != "admin":
         return jsonify({'error': 'Unauthorized'}), 403
 
-    # Tüm kullanıcıları listele
-    users = Admin.query.all()
-    users_list = [{"id": u.id, "username": u.username, "role": u.role} for u in users]
+    student_to_upg = Student.query.get(student_id)
+    if not student_to_upg:
+        return jsonify({"error":"Student not found"}), 404 
 
-    return jsonify(users_list), 200
+    data = request.get_json()
+    
+    student_to_upg.username = data.get('username', student_to_upg.username)
+    student_to_upg.lastname = data.get('lastname', student_to_upg.lastname)
+    student_to_upg.tc = data.get('tc', student_to_upg.tc)
+    student_to_upg.school_number = data.get('school_number', student_to_upg.school_number)
+    student_to_upg.grade = data.get('grade', student_to_upg.grade)
+    
+    db.session.commit()
+    
+    return jsonify({'message': 'Student updated successfully', 'student': {
+        'id': student_to_upg.id,
+        'username': student_to_upg.username,
+        'lastname': student_to_upg.lastname,
+        'tc': student_to_upg.tc,
+        'school_number': student_to_upg.school_number,
+        'grade': student_to_upg.grade
+    }}), 200
 
-# Kullanıcı Sil (Admin için)
-@admin_bp.route('/user/<int:user_id>', methods=['DELETE'])
+
+# Öğretmen Profili Güncelleme
+@admin_bp.route("/teacher/<int:teacher_id>", methods=["UPDATE"])
 @jwt_required()
-def delete_user(user_id):
+def update_teacher(teacher_id):
+    user_id = get_jwt_identity()
+    admin_user = Admin.query.get(user_id)
+    
+    if admin_user.role != "admin":
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    teacher = Teacher.query.get(teacher_id)
+    if not teacher:
+        return jsonify({"error":"Teacher not found"}), 404
+
+    
+    data = request.get_json()
+
+    teacher.username = data.get('username', teacher.username)
+    teacher.lastname = data.get('lastname', teacher.lastname)
+    teacher.tc = data.get('tc', teacher.tc)
+    teacher.teacher_number = data.get('teacher_number', teacher.teacher_number)
+    teacher.subject = data.get('subject', teacher.subject)
+    
+    db.session.commit()
+
+    return jsonify({'message': 'Teacher updated successfully', 'teacher': {
+        'id': teacher.id,
+        'username': teacher.username,
+        'lastname': teacher.lastname,
+        'tc': teacher.tc,
+        'teacher_number': teacher.teacher_number,
+        'subject': teacher.subject
+    }}), 200
+
+
+# Öğrenci Sil
+@admin_bp.route('/student/<int:student_id>', methods=['DELETE'])
+@jwt_required()
+def delete_user(student_id):
     user_id_admin = get_jwt_identity()
     admin_user = Admin.query.get(user_id_admin)
 
     if admin_user.role != 'admin':
         return jsonify({'error': 'Unauthorized'}), 403
 
-    user_to_delete = Admin.query.get(user_id)
+    user_to_delete = Student.query.get(student_id)
     if not user_to_delete:
-        return jsonify({'error': 'User not found'}), 404
+        return jsonify({'error': 'Student not found'}), 404
 
     # Kullanıcıyı sil
     db.session.delete(user_to_delete)
     db.session.commit()
 
     return jsonify({'message': 'User deleted successfully'}), 200
+
+# Öğrenci Kayıt İşlemi    
+@admin_bp.route('/create-student', methods=['POST'])
+@jwt_required()
+def register_student():
+    user_id_admin = get_jwt_identity()
+    admin_user = Admin.query.get(user_id_admin)
+
+    if admin_user.role != 'admin':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    data = request.get_json()
+    username = data.get('username')
+    lastname = data.get('lastname')
+    tc = data.get('tc')
+    school_number = data.get('school_number')
+    password = data.get('password')
+    grade = data.get('grade', None)
+
+    if Student.query.filter_by(tc=tc).first():
+        return {"error": "Bu tc kimlik numarasına sahip bir öğrenci var"}, 400
+    if Student.query.filter_by(school_number=school_number).first():
+        return {"error": "Bu okul numarasına sahip bir kişi var"}, 400
+
+    hashed_password = generate_password_hash(password)
+    new_student = Student(username=username, lastname=lastname, tc=tc,
+                          school_number=school_number, password=hashed_password,
+                          role='student', grade=grade)
+    
+    db.session.add(new_student)
+    db.session.commit()
+
+    return {"message": "Student registered successfully"}, 201
 
 # Öğretmen kayıt işlemi
 @admin_bp.route('/create-teacher', methods=['POST'])
@@ -100,3 +228,22 @@ def delete_teacher(teacher_id):
     db.session.commit()
 
     return jsonify({'message': 'Teacher deleted successfully'}), 200
+
+# Öğretmen Kullanıcı Listesini Getir
+@admin_bp.route('/teacher-list', methods=['GET'])
+@jwt_required()
+def get_teachers():
+    user_id = get_jwt_identity()
+    admin_user = Admin.query.get(user_id)
+
+    # Admin kontrolü
+    if admin_user.role != 'admin':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    # Tüm öğretmenleri listele
+    teachers = Teacher.query.all()
+    teachers_list = [{"id": t.id, "username": t.username, "lastname": t.lastname, 
+                      "tc": t.tc, "teacher_number": t.teacher_number, "subject": t.subject} 
+                     for t in teachers]
+
+    return jsonify(teachers_list), 200

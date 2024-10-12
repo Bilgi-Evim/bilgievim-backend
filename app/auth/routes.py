@@ -22,32 +22,6 @@ def studentLogin():
     
     return jsonify({'access_token': access_token, 'role': student.role}), 200
 
-# Öğrenci Kayıt İşlemi    
-@auth_bp.route('/register/student', methods=['POST'])
-def register_student():
-    data = request.get_json()
-    username = data.get('username')
-    lastname = data.get('lastname')
-    tc = data.get('tc')
-    school_number = data.get('school_number')
-    password = data.get('password')
-    grade = data.get('grade', None)
-
-    if Student.query.filter_by(tc=tc).first():
-        return {"error": "Bu tc kimlik numarasına sahip bir öğrenci var"}, 400
-    if Student.query.filter_by(school_number=school_number).first():
-        return {"error": "Bu okul numarasına sahip bir kişi var"}, 400
-
-    hashed_password = generate_password_hash(password)
-    new_student = Student(username=username, lastname=lastname, tc=tc,
-                          school_number=school_number, password=hashed_password,
-                          role='student', grade=grade)
-    
-    db.session.add(new_student)
-    db.session.commit()
-
-    return {"message": "Student registered successfully"}, 201
-
 
 # Öğretmen giriş işlemi
 @auth_bp.route('/login/teacher', methods=['POST'])
