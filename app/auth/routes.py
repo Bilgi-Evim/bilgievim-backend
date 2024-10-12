@@ -49,7 +49,6 @@ def register_student():
     return {"message": "Student registered successfully"}, 201
 
 
-
 # Öğretmen giriş işlemi
 @auth_bp.route('/login/teacher', methods=['POST'])
 def login_teacher():

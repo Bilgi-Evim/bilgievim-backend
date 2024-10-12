@@ -56,6 +56,7 @@ def delete_user(user_id):
 
 # Öğretmen kayıt işlemi
 @admin_bp.route('/create-teacher', methods=['POST'])
+@jwt_required()
 def register_teacher():
     data = request.get_json()
     username = data.get('username')
@@ -79,3 +80,23 @@ def register_teacher():
     db.session.commit()
 
     return {"message": "Teacher registered successfully"}, 201
+
+# Öğretmen silme işlemi
+@admin_bp.route("/delete-teacher/<int:teacher_id>",methods=['DELETE'])
+@jwt_required()
+def delete_teacher(teacher_id):
+    user_id_admin = get_jwt_identity()
+    admin_user = Admin.query.get(user_id_admin)
+
+    if admin_user.role != 'admin':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    teacher_to_delete = Teacher.query.get(teacher_id)
+    if not teacher_to_delete:
+        return jsonify({'error': 'Teacher not found'}), 404
+
+    # Öğretmeni sil
+    db.session.delete(teacher_to_delete)
+    db.session.commit()
+
+    return jsonify({'message': 'Teacher deleted successfully'}), 200
