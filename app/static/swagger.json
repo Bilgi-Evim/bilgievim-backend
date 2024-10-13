@@ -1,193 +1,580 @@
 {
-  "swagger": "2.0",
+  "openapi": "3.0.0",
   "info": {
-    "title": "Bilgi Evim API",
-    "description": "Bilgi Evim Dershane Sistemi API",
-    "version": "1.0.0"
+    "title": "School Management API",
+    "version": "1.0.0",
+    "description": "API for managing students, teachers, and admin functionalities."
   },
-  "host": "127.0.0.1:5000",
-  "basePath": "/api",
-  "schemes": [
-    "http"
-  ],
   "paths": {
-    "/student/register": {
+    "/login/student": {
       "post": {
-        "summary": "Register a new student",
-        "description": "Registers a new student in the system",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "description": "Student data",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "username": { "type": "string" },
-                "lastname": { "type": "string" },
-                "tc": { "type": "string" },
-                "school_number": { "type": "string" },
-                "password": { "type": "string" },
-                "grade": { "type": "string" }
+        "summary": "Student Login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tc": {
+                    "type": "string",
+                    "example": "12345678901"
+                  },
+                  "school_number": {
+                    "type": "string",
+                    "example": "12345"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "studentPassword"
+                  }
+                },
+                "required": ["tc", "school_number", "password"]
               }
             }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful login",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "access_token": {
+                        "type": "string"
+                      },
+                      "role": {
+                        "type": "string",
+                        "example": "student"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Invalid credentials"
+            }
           }
-        ],
-        "responses": {
-          "201": { "description": "Student registered successfully" },
-          "400": { "description": "Bad request" }
         }
       }
     },
-    "/login/student": {
+    "/login/teacher": {
       "post": {
-        "summary": "Login as a student",
-        "description": "Logs in a student and returns an access token",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "description": "Student login credentials",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "tc": { "type": "string" },
-                "school_number": { "type": "string" },
-                "password": { "type": "string" }
+        "summary": "Teacher Login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tc": {
+                    "type": "string",
+                    "example": "12345678901"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "teacherPassword"
+                  }
+                },
+                "required": ["tc", "password"]
               }
             }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful login",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "Login successful"
+                      },
+                      "access_token": {
+                        "type": "string"
+                      },
+                      "username": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Invalid credentials"
+            }
+          }
+        }
+      }
+    },
+    "/login/admin": {
+      "post": {
+        "summary": "Admin Login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "adminUser"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "adminPassword"
+                  }
+                },
+                "required": ["username", "password"]
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful login",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "Login successful"
+                      },
+                      "access_token": {
+                        "type": "string"
+                      },
+                      "username": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Invalid credentials"
+            }
+          }
+        }
+      }
+    },
+    "/student-list": {
+      "get": {
+        "summary": "Get All Students",
+        "security": [
+          {
+            "Bearer": []
           }
         ],
         "responses": {
           "200": {
-            "description": "Login successful",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "access_token": { "type": "string" },
-                "role": { "type": "string" }
+            "description": "List of students",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "username": {
+                        "type": "string"
+                      },
+                      "lastname": {
+                        "type": "string"
+                      },
+                      "school_number": {
+                        "type": "string"
+                      },
+                      "tc": {
+                        "type": "string"
+                      },
+                      "grade": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
               }
             }
           },
-          "401": { "description": "Invalid credentials" }
+          "403": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/create-student": {
+      "post": {
+        "summary": "Create Student",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "studentUser"
+                  },
+                  "lastname": {
+                    "type": "string",
+                    "example": "StudentLastName"
+                  },
+                  "tc": {
+                    "type": "string",
+                    "example": "12345678901"
+                  },
+                  "school_number": {
+                    "type": "string",
+                    "example": "12345"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "studentPassword"
+                  },
+                  "grade": {
+                    "type": "string",
+                    "example": "10A"
+                  }
+                },
+                "required": ["username", "lastname", "tc", "school_number", "password"]
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Student registered successfully"
+            },
+            "400": {
+              "description": "Student with given TC or school number already exists"
+            },
+            "403": {
+              "description": "Unauthorized"
+            }
+          }
+        }
+      }
+    },
+    "/create-teacher": {
+      "post": {
+        "summary": "Create Teacher",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "teacherUser"
+                  },
+                  "lastname": {
+                    "type": "string",
+                    "example": "TeacherLastName"
+                  },
+                  "tc": {
+                    "type": "string",
+                    "example": "12345678901"
+                  },
+                  "teacher_number": {
+                    "type": "string",
+                    "example": "98765"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "teacherPassword"
+                  },
+                  "subject": {
+                    "type": "string",
+                    "example": "Mathematics"
+                  }
+                },
+                "required": ["username", "lastname", "tc", "teacher_number", "password", "subject"]
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Teacher registered successfully"
+            },
+            "400": {
+              "description": "Teacher with given TC or teacher number already exists"
+            },
+            "403": {
+              "description": "Unauthorized"
+            }
+          }
+        }
+      }
+    },
+    "/teacher-list": {
+      "get": {
+        "summary": "Get All Teachers",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of teachers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "username": {
+                        "type": "string"
+                      },
+                      "lastname": {
+                        "type": "string"
+                      },
+                      "tc": {
+                        "type": "string"
+                      },
+                      "teacher_number": {
+                        "type": "string"
+                      },
+                      "subject": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized"
+          }
         }
       }
     },
     "/student/{student_id}": {
       "put": {
-        "summary": "Update student profile",
-        "description": "Updates a student's profile (Admin only)",
+        "summary": "Update Student",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "in": "path",
             "name": "student_id",
-            "required": true,
-            "type": "integer",
-            "description": "ID of the student to update"
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "description": "Student update data",
+            "in": "path",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "username": { "type": "string" },
-                "lastname": { "type": "string" },
-                "tc": { "type": "string" },
-                "school_number": { "type": "string" },
-                "grade": { "type": "string" }
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "updatedStudentUser"
+                  },
+                  "lastname": {
+                    "type": "string",
+                    "example": "UpdatedLastName"
+                  },
+                  "school_number": {
+                    "type": "string",
+                    "example": "54321"
+                  },
+                  "tc": {
+                    "type": "string",
+                    "example": "10987654321"
+                  },
+                  "grade": {
+                    "type": "string",
+                    "example": "11B"
+                  }
+                }
               }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Student updated successfully"
+            },
+            "400": {
+              "description": "Invalid input"
+            },
+            "404": {
+              "description": "Student not found"
+            },
+            "403": {
+              "description": "Unauthorized"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Student",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "student_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
         ],
         "responses": {
-          "200": { "description": "Student updated successfully" },
-          "403": { "description": "Unauthorized" },
-          "404": { "description": "Student not found" }
+          "204": {
+            "description": "Student deleted successfully"
+          },
+          "404": {
+            "description": "Student not found"
+          },
+          "403": {
+            "description": "Unauthorized"
+          }
         }
       }
     },
     "/teacher/{teacher_id}": {
       "put": {
-        "summary": "Update teacher profile",
-        "description": "Updates a teacher's profile (Admin only)",
+        "summary": "Update Teacher",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "in": "path",
             "name": "teacher_id",
-            "required": true,
-            "type": "integer",
-            "description": "ID of the teacher to update"
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "description": "Teacher update data",
+            "in": "path",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "username": { "type": "string" },
-                "lastname": { "type": "string" },
-                "tc": { "type": "string" },
-                "teacher_number": { "type": "string" },
-                "subject": { "type": "string" }
-              }
+              "type": "integer"
             }
           }
         ],
-        "responses": {
-          "200": { "description": "Teacher updated successfully" },
-          "403": { "description": "Unauthorized" },
-          "404": { "description": "Teacher not found" }
-        }
-      }
-    },
-    "/user/{user_id}": {
-      "delete": {
-        "summary": "Delete a user",
-        "description": "Deletes a user by ID (Admin only)",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "user_id",
-            "description": "ID of the user to delete",
-            "required": true,
-            "type": "integer"
-          }
-        ],
-        "responses": {
-          "200": { "description": "User deleted successfully" },
-          "404": { "description": "User not found" },
-          "403": { "description": "Unauthorized" }
-        }
-      }
-    },
-    "/users": {
-      "get": {
-        "summary": "Get all users",
-        "description": "Retrieves a list of all users (Admin only)",
-        "responses": {
-          "200": {
-            "description": "User list retrieved successfully",
-            "schema": {
-              "type": "array",
-              "items": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
                 "type": "object",
                 "properties": {
-                  "id": { "type": "integer" },
-                  "username": { "type": "string" },
-                  "role": { "type": "string" }
+                  "username": {
+                    "type": "string",
+                    "example": "updatedTeacherUser"
+                  },
+                  "lastname": {
+                    "type": "string",
+                    "example": "UpdatedLastName"
+                  },
+                  "teacher_number": {
+                    "type": "string",
+                    "example": "98766"
+                  },
+                  "tc": {
+                    "type": "string",
+                    "example": "12345678902"
+                  },
+                  "subject": {
+                    "type": "string",
+                    "example": "Physics"
+                  }
                 }
               }
             }
           },
-          "403": { "description": "Unauthorized" }
+          "responses": {
+            "200": {
+              "description": "Teacher updated successfully"
+            },
+            "400": {
+              "description": "Invalid input"
+            },
+            "404": {
+              "description": "Teacher not found"
+            },
+            "403": {
+              "description": "Unauthorized"
+            }
+          }
         }
+      },
+      "delete": {
+        "summary": "Delete Teacher",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "teacher_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Teacher deleted successfully"
+          },
+          "404": {
+            "description": "Teacher not found"
+          },
+          "403": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }
