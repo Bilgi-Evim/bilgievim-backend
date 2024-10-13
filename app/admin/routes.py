@@ -20,8 +20,8 @@ def admin_dashboard():
     return jsonify({'message': 'Admin dashboard'}), 200
 
 # Admin Bilgi Güncelleme
-@admin_bp.route("/<int:admin_id>", mehods=["UPDATE"])
-@jwt_required
+@admin_bp.route("/<int:admin_id>", methods=["PUT"])
+@jwt_required()
 def admin_update(admin_id):
     user_id = get_jwt_identity()
     admin = Admin.query.get(user_id)
@@ -61,7 +61,7 @@ def get_students():
     return jsonify(student_list), 200
 
 # Öğrenci Profili Güncelleme
-@admin_bp.route("/student/<int:student_id>",methods=["UPDATE"])
+@admin_bp.route("/student/<int:student_id>",methods=["PUT"])
 @jwt_required()
 def update_student(student_id):
     user_id = get_jwt_identity()
@@ -95,7 +95,7 @@ def update_student(student_id):
 
 
 # Öğretmen Profili Güncelleme
-@admin_bp.route("/teacher/<int:teacher_id>", methods=["UPDATE"])
+@admin_bp.route("/teacher/<int:teacher_id>", methods=["PUT"])
 @jwt_required()
 def update_teacher(teacher_id):
     user_id = get_jwt_identity()
