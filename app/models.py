@@ -11,6 +11,7 @@ class Subject(db.Model):
     __tablename__ = 'subject'
     subject_id = db.Column(db.Integer, primary_key=True)
     subject_name = db.Column(db.String(100))
+    subject_code = db.Column(db.String(5), unique=True, nullable=False)
     teachers = db.relationship('Teacher', backref='subject', lazy=True)
     private_lessons = db.relationship('PrivateLesson', backref='subject', lazy=True)
 
