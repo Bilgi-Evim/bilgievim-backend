@@ -4,7 +4,7 @@ from app.models import Admin
 from . import admin_bp
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
-from app.models import Teacher,Admin,Student,Subject
+from app.models import Teacher,Admin,Student,Subject, Class
 
 # Admin Dashboard
 @admin_bp.route('/dashboard', methods=['GET'])
@@ -273,4 +273,29 @@ def add_subject():
     db.session.commit()
     
     return {"message": "Subject successfully added"}, 201
+
+
+@admin_bp.route("/add-class",methods=["POST"])
+@jwt_required()
+def add_class():
+    user_id = get_jwt_identity()
+    admin = Admin.query.get(user_id)
+    
+    if admin.role != "admin":
+        return jsonify({"error":"Unauthorized"}), 403
+    
+    data = request.get_json()
+    grade = data.get("grade")
+    
+    if Class.query.filter_by(grade = grade).first():
+        return {"error":"Bu ada sahip başka bir sınıf var"}
+    
+    
+    new_class = Class(grade=grade)
+    
+    db.session.add(new_class)
+    db.session.commit()
+    
+    return {"message": "Class successfully added"}, 201
+    
     
