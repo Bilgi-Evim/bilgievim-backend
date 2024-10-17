@@ -164,7 +164,7 @@ def register_student():
     tc = data.get('tc')
     school_number = data.get('school_number')
     password = data.get('password')
-    grade = data.get('grade', None)
+    class_id = data.get("class_id")
 
     if Student.query.filter_by(tc=tc).first():
         return {"error": "Bu tc kimlik numarasına sahip bir öğrenci var"}, 400
@@ -174,7 +174,7 @@ def register_student():
     hashed_password = generate_password_hash(password)
     new_student = Student(name=name, lastname=lastname, tc=tc,
                           school_number=school_number, password=hashed_password,
-                          role='student', grade=grade)
+                          role='student', class_id=class_id)
     
     db.session.add(new_student)
     db.session.commit()
@@ -186,22 +186,33 @@ def register_student():
 @jwt_required()
 def register_teacher():
     data = request.get_json()
+    
     name = data.get('name')
     lastname = data.get('lastname')
     tc = data.get('tc')
     teacher_number = data.get('teacher_number')
     password = data.get('password')
-    subject = data.get('subject')
+    subject_id = data.get('subject_id') 
+    classroom_id = data.get('classroom_id')
 
     if Teacher.query.filter_by(tc=tc).first():
-        return {"error": "Bu Tc kimlik numarasına sahip başka bir öğretmen var"}, 400
+        return {"error": "Bu TC kimlik numarasına sahip başka bir öğretmen var"}, 400
+    
     if Teacher.query.filter_by(teacher_number=teacher_number).first():
         return {"error": "Bu numarada farklı bir öğretmen var"}, 400
 
     hashed_password = generate_password_hash(password)
-    new_teacher = Teacher(name=name, lastname=lastname, tc=tc,
-                          teacher_number=teacher_number, password=hashed_password,
-                          role='teacher', subject=subject)
+
+    new_teacher = Teacher(
+        name=name,
+        lastname=lastname,
+        tc=tc,
+        teacher_number=teacher_number,
+        password=hashed_password,
+        role='teacher',
+        classroom_id=classroom_id,
+        subject_id=subject_id
+    )
 
     db.session.add(new_teacher)
     db.session.commit()
