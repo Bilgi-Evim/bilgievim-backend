@@ -20,7 +20,6 @@ class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     lastname = db.Column(db.String(100))
-    class_name = db.Column(db.String(10))
     tc = db.Column(db.String(11), unique=True)
     school_number = db.Column(db.String(20), unique=True)
     role = db.Column(db.String(50))
@@ -50,7 +49,7 @@ class Admin(db.Model):
     password = db.Column(db.String(100))
 
 class PrivateLesson(db.Model):
-    __tablename__ = 'private_lesson'
+    __tablename__ = 'privatelesson'
     private_lesson_id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.Text)
     teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'))
