@@ -13,7 +13,7 @@ class Subject(db.Model):
     subject_name = db.Column(db.String(100))
     subject_code = db.Column(db.String(5), unique=True, nullable=False)
     teachers = db.relationship('Teacher', backref='subject', lazy=True)
-    private_lessons = db.relationship('PrivateLesson', backref='subject', lazy=True)
+    private_lessons = db.relationship('PrivateLesson', backref='subject_info', lazy=True)
 
 class Student(db.Model):
     __tablename__ = 'students'
@@ -25,7 +25,7 @@ class Student(db.Model):
     role = db.Column(db.String(50))
     password = db.Column(db.String(100))
     class_id = db.Column(db.Integer, db.ForeignKey('class.id'))
-    private_lessons = db.relationship('PrivateLesson', backref='student', lazy=True)
+    private_lessons = db.relationship('PrivateLesson', backref='student_info', lazy=True)
 
 class Teacher(db.Model):
     __tablename__ = 'teachers'
@@ -38,7 +38,7 @@ class Teacher(db.Model):
     password = db.Column(db.String(100))
     classroom_id = db.Column(db.Integer, db.ForeignKey('class.id'))
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.subject_id'))
-    private_lessons = db.relationship('PrivateLesson', backref='teacher', lazy=True)
+    private_lessons = db.relationship('PrivateLesson', backref='taught_by', lazy=True, overlaps="private_lessons_taught")
 
 class Admin(db.Model):
     __tablename__ = 'admin'
@@ -57,3 +57,7 @@ class PrivateLesson(db.Model):
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.subject_id'))
     time = db.Column(db.DateTime)
     location = db.Column(db.String(255))
+    
+    student = db.relationship('Student', backref='lessons')
+    subject = db.relationship('Subject', backref='lessons')
+    teacher = db.relationship('Teacher', backref='private_lessons_taught', lazy=True, overlaps="private_lessons")
