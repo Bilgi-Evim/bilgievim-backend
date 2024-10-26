@@ -1,14 +1,56 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "School Management API",
-    "version": "1.0.0",
-    "description": "API for managing students, teachers, and admin functionalities."
+    "title": "Bilgi Evim Eğitim Yönetim Sistemi API",
+    "description": "Bilgi Evim Eğitim yönetim sistemi için oluşturulmuş API'ler.",
+    "version": "1.0.0"
   },
   "paths": {
-    "/login/student": {
-      "post": {
-        "summary": "Student Login",
+    "/admin/dashboard": {
+      "get": {
+        "tags": ["Admin Routes"],
+        "summary": "Admin Dashboard",
+        "description": "Admin'in ana sayfasına erişim sağlar.",
+        "security": [{"jwtAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Başarılı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Admin dashboard"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetkisiz erişim"
+          }
+        }
+      }
+    },
+    "/admin/{admin_id}": {
+      "put": {
+        "tags": ["Admin Routes"],
+        "summary": "Admin Bilgi Güncelleme",
+        "description": "Admin bilgilerini günceller.",
+        "parameters": [
+          {
+            "name": "admin_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "security": [{"jwtAuth": []}],
         "requestBody": {
           "required": true,
           "content": {
@@ -16,53 +58,86 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "tc": {
-                    "type": "string",
-                    "example": "12345678901"
-                  },
-                  "school_number": {
-                    "type": "string",
-                    "example": "12345"
-                  },
-                  "password": {
-                    "type": "string",
-                    "example": "studentPassword"
-                  }
-                },
-                "required": ["tc", "school_number", "password"]
+                  "name": {"type": "string"},
+                  "password": {"type": "string"}
+                }
               }
             }
-          },
-          "responses": {
-            "200": {
-              "description": "Successful login",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "access_token": {
-                        "type": "string"
-                      },
-                      "role": {
-                        "type": "string",
-                        "example": "student"
-                      }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Başarılı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Admin profile updated successfully"
                     }
                   }
                 }
               }
-            },
-            "401": {
-              "description": "Invalid credentials"
             }
+          },
+          "403": {
+            "description": "Yetkisiz erişim"
           }
         }
       }
     },
-    "/login/teacher": {
-      "post": {
-        "summary": "Teacher Login",
+    "/admin/student-list": {
+      "get": {
+        "tags": ["Admin Routes"],
+        "summary": "Tüm Öğrencileri Getir",
+        "description": "Sistemde kayıtlı tüm öğrencileri getirir.",
+        "security": [{"jwtAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Başarılı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {"type": "integer"},
+                      "name": {"type": "string"},
+                      "lastname": {"type": "string"},
+                      "school_number": {"type": "integer"},
+                      "tc": {"type": "string"},
+                      "class_id": {"type": "integer"}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetkisiz erişim"
+          }
+        }
+      }
+    },
+    "/admin/student/{student_id}": {
+      "put": {
+        "tags": ["Admin Routes"],
+        "summary": "Öğrenci Profili Güncelleme",
+        "description": "Öğrenci profil bilgilerini günceller.",
+        "parameters": [
+          {
+            "name": "student_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "security": [{"jwtAuth": []}],
         "requestBody": {
           "required": true,
           "content": {
@@ -70,52 +145,128 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "tc": {
-                    "type": "string",
-                    "example": "12345678901"
-                  },
-                  "password": {
-                    "type": "string",
-                    "example": "teacherPassword"
-                  }
-                },
-                "required": ["tc", "password"]
+                  "name": {"type": "string"},
+                  "lastname": {"type": "string"},
+                  "tc": {"type": "string"},
+                  "school_number": {"type": "integer"},
+                  "class_id": {"type": "string"}
+                }
               }
             }
-          },
-          "responses": {
-            "200": {
-              "description": "Successful login",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "message": {
-                        "type": "string",
-                        "example": "Login successful"
-                      },
-                      "access_token": {
-                        "type": "string"
-                      },
-                      "username": {
-                        "type": "string"
-                      }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Başarılı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Student updated successfully"
                     }
                   }
                 }
               }
-            },
-            "401": {
-              "description": "Invalid credentials"
             }
+          },
+          "403": {
+            "description": "Yetkisiz erişim"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Admin Routes"],
+        "summary": "Öğrenci Sil",
+        "description": "Belirtilen öğrenci ID'sine göre öğrenciyi siler.",
+        "parameters": [
+          {
+            "name": "student_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "security": [{"jwtAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Başarılı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetkisiz erişim"
           }
         }
       }
     },
-    "/login/admin": {
+    "/admin/create-student": {
       "post": {
+        "tags": ["Admin Routes"],
+        "summary": "Öğrenci Kayıt İşlemi",
+        "description": "Yeni bir öğrenci kaydı oluşturur.",
+        "security": [{"jwtAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {"type": "string"},
+                  "lastname": {"type": "string"},
+                  "tc": {"type": "string"},
+                  "school_number": {"type": "integer"},
+                  "password": {"type": "string"},
+                  "class_id": {"type": "integer"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Başarılı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Student registered successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetkisiz erişim"
+          }
+        }
+      }
+    },
+    "/auth/login/admin": {
+      "post": {
+        "tags": ["Auth"],
         "summary": "Admin Login",
+        "description": "Admin'in giriş işlemini sağlar.",
         "requestBody": {
           "required": true,
           "content": {
@@ -123,458 +274,184 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "username": {
+                  "name": {
                     "type": "string",
-                    "example": "adminUser"
+                    "example": "admin"
                   },
                   "password": {
                     "type": "string",
-                    "example": "adminPassword"
+                    "example": "admin"
                   }
                 },
-                "required": ["username", "password"]
+                "required": ["name", "password"]
               }
             }
-          },
-          "responses": {
-            "200": {
-              "description": "Successful login",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "message": {
-                        "type": "string",
-                        "example": "Login successful"
-                      },
-                      "access_token": {
-                        "type": "string"
-                      },
-                      "username": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "401": {
-              "description": "Invalid credentials"
-            }
           }
-        }
-      }
-    },
-    "/student-list": {
-      "get": {
-        "summary": "Get All Students",
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
+        },
         "responses": {
           "200": {
-            "description": "List of students",
+            "description": "Başarılı",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "integer"
-                      },
-                      "username": {
-                        "type": "string"
-                      },
-                      "lastname": {
-                        "type": "string"
-                      },
-                      "school_number": {
-                        "type": "string"
-                      },
-                      "tc": {
-                        "type": "string"
-                      },
-                      "grade": {
-                        "type": "string"
-                      }
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1..."
+                    },
+                    "role": {
+                      "type": "string",
+                      "example": "admin"
                     }
                   }
                 }
               }
             }
           },
-          "403": {
-            "description": "Unauthorized"
-          }
-        }
-      }
-    },
-    "/create-student": {
-      "post": {
-        "summary": "Create Student",
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "username": {
-                    "type": "string",
-                    "example": "studentUser"
-                  },
-                  "lastname": {
-                    "type": "string",
-                    "example": "StudentLastName"
-                  },
-                  "tc": {
-                    "type": "string",
-                    "example": "12345678901"
-                  },
-                  "school_number": {
-                    "type": "string",
-                    "example": "12345"
-                  },
-                  "password": {
-                    "type": "string",
-                    "example": "studentPassword"
-                  },
-                  "grade": {
-                    "type": "string",
-                    "example": "10A"
-                  }
-                },
-                "required": ["username", "lastname", "tc", "school_number", "password"]
-              }
-            }
-          },
-          "responses": {
-            "201": {
-              "description": "Student registered successfully"
-            },
-            "400": {
-              "description": "Student with given TC or school number already exists"
-            },
-            "403": {
-              "description": "Unauthorized"
-            }
-          }
-        }
-      }
-    },
-    "/create-teacher": {
-      "post": {
-        "summary": "Create Teacher",
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "username": {
-                    "type": "string",
-                    "example": "teacherUser"
-                  },
-                  "lastname": {
-                    "type": "string",
-                    "example": "TeacherLastName"
-                  },
-                  "tc": {
-                    "type": "string",
-                    "example": "12345678901"
-                  },
-                  "teacher_number": {
-                    "type": "string",
-                    "example": "98765"
-                  },
-                  "password": {
-                    "type": "string",
-                    "example": "teacherPassword"
-                  },
-                  "subject": {
-                    "type": "string",
-                    "example": "Mathematics"
-                  }
-                },
-                "required": ["username", "lastname", "tc", "teacher_number", "password", "subject"]
-              }
-            }
-          },
-          "responses": {
-            "201": {
-              "description": "Teacher registered successfully"
-            },
-            "400": {
-              "description": "Teacher with given TC or teacher number already exists"
-            },
-            "403": {
-              "description": "Unauthorized"
-            }
-          }
-        }
-      }
-    },
-    "/teacher-list": {
-      "get": {
-        "summary": "Get All Teachers",
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of teachers",
+          "401": {
+            "description": "Geçersiz kimlik bilgileri",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "integer"
-                      },
-                      "username": {
-                        "type": "string"
-                      },
-                      "lastname": {
-                        "type": "string"
-                      },
-                      "tc": {
-                        "type": "string"
-                      },
-                      "teacher_number": {
-                        "type": "string"
-                      },
-                      "subject": {
-                        "type": "string"
-                      }
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Invalid credentials"
                     }
                   }
                 }
               }
             }
-          },
-          "403": {
-            "description": "Unauthorized"
-          }
-        }
-      }
-    },
-    "/student/{student_id}": {
-      "put": {
-        "summary": "Update Student",
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "student_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "username": {
-                    "type": "string",
-                    "example": "updatedStudentUser"
-                  },
-                  "lastname": {
-                    "type": "string",
-                    "example": "UpdatedLastName"
-                  },
-                  "school_number": {
-                    "type": "string",
-                    "example": "54321"
-                  },
-                  "tc": {
-                    "type": "string",
-                    "example": "10987654321"
-                  },
-                  "grade": {
-                    "type": "string",
-                    "example": "11B"
-                  }
-                }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "Student updated successfully"
-            },
-            "400": {
-              "description": "Invalid input"
-            },
-            "404": {
-              "description": "Student not found"
-            },
-            "403": {
-              "description": "Unauthorized"
-            }
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete Student",
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "student_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Student deleted successfully"
-          },
-          "404": {
-            "description": "Student not found"
-          },
-          "403": {
-            "description": "Unauthorized"
-          }
-        }
-      }
-    },
-    "/teacher/{teacher_id}": {
-      "put": {
-        "summary": "Update Teacher",
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "teacher_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "username": {
-                    "type": "string",
-                    "example": "updatedTeacherUser"
-                  },
-                  "lastname": {
-                    "type": "string",
-                    "example": "UpdatedLastName"
-                  },
-                  "teacher_number": {
-                    "type": "string",
-                    "example": "98766"
-                  },
-                  "tc": {
-                    "type": "string",
-                    "example": "12345678902"
-                  },
-                  "subject": {
-                    "type": "string",
-                    "example": "Physics"
-                  }
-                }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "Teacher updated successfully"
-            },
-            "400": {
-              "description": "Invalid input"
-            },
-            "404": {
-              "description": "Teacher not found"
-            },
-            "403": {
-              "description": "Unauthorized"
-            }
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete Teacher",
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "teacher_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Teacher deleted successfully"
-          },
-          "404": {
-            "description": "Teacher not found"
-          },
-          "403": {
-            "description": "Unauthorized"
           }
         }
       }
     }
   },
+  "/admin/teacher/{teacher_id}": {
+    "put": {
+      "tags": ["Admin Routes"],
+      "summary": "Öğretmen Profili Güncelleme",
+      "description": "Öğretmen profil bilgilerini günceller.",
+      "parameters": [
+        {
+          "name": "teacher_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "security": [{"jwtAuth": []}],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {"type": "string"},
+                "lastname": {"type": "string"},
+                "tc": {"type": "string"},
+                "teacher_number": {"type": "string"},
+                "subject_id": {"type": "integer"},
+                "classroom_id": {"type": "integer"}
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Başarılı",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "Teacher updated successfully"
+                  },
+                  "teacher": {
+                    "type": "object",
+                    "properties": {
+                      "id": {"type": "integer"},
+                      "name": {"type": "string"},
+                      "lastname": {"type": "string"},
+                      "tc": {"type": "string"},
+                      "teacher_number": {"type": "integer"},
+                      "subject_id": {"type": "integer"},
+                      "classroom_id": {"type": "integer"}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "Yetkisiz erişim"
+        },
+        "404": {
+          "description": "Öğretmen bulunamadı",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "type": "string",
+                    "example": "Teacher not found"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
   "components": {
     "securitySchemes": {
-      "Bearer": {
+      "jwtAuth": {
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Admin": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "name": {"type": "string"},
+          "role": {"type": "string"}
+        }
+      },
+      "Student": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "name": {"type": "string"},
+          "lastname": {"type": "string"},
+          "school_number": {"type": "integer"},
+          "tc": {"type": "string"},
+          "grade": {"type": "string"}
+        }
+      },
+      "Teacher": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "name": {"type": "string"},
+          "lastname": {"type": "string"},
+          "teacher_number": {"type": "integer"},
+          "subject": {"type": "string"}
+        }
       }
     }
   }

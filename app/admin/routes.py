@@ -55,7 +55,7 @@ def get_students():
         return jsonify({'error':'Unauthorized'}), 403
     
     students = Student.query.all()
-    student_list = [{"id": s.id, "name":s.name, "lastname":s.lastname, "school_number":s.school_number,"tc":s.tc, "grade":s.grade} for s in students]
+    student_list = [{"name":s.name, "lastname":s.lastname, "school_number":s.school_number,"tc":s.tc, "class_id":s.class_id} for s in students]
     
     return jsonify(student_list), 200
 
@@ -79,7 +79,7 @@ def update_student(student_id):
     student_to_upg.lastname = data.get('lastname', student_to_upg.lastname)
     student_to_upg.tc = data.get('tc', student_to_upg.tc)
     student_to_upg.school_number = data.get('school_number', student_to_upg.school_number)
-    student_to_upg.grade = data.get('grade', student_to_upg.grade)
+    student_to_upg.class_id = data.get('class_id', student_to_upg.class_id)
     
     db.session.commit()
     
@@ -89,7 +89,7 @@ def update_student(student_id):
         'lastname': student_to_upg.lastname,
         'tc': student_to_upg.tc,
         'school_number': student_to_upg.school_number,
-        'grade': student_to_upg.grade
+        'class_id': student_to_upg.class_id
     }}), 200
 
 
@@ -114,7 +114,8 @@ def update_teacher(teacher_id):
     teacher.lastname = data.get('lastname', teacher.lastname)
     teacher.tc = data.get('tc', teacher.tc)
     teacher.teacher_number = data.get('teacher_number', teacher.teacher_number)
-    teacher.subject = data.get('subject', teacher.subject)
+    teacher.classroom_id = data.get('classroom_id', teacher.classroom_id)
+    teacher.subject_id = data.get('subject_id', teacher.subject_id)
     
     db.session.commit()
 
@@ -124,7 +125,8 @@ def update_teacher(teacher_id):
         'lastname': teacher.lastname,
         'tc': teacher.tc,
         'teacher_number': teacher.teacher_number,
-        'subject': teacher.subject
+        'subject_id': teacher.subject_id,
+        'classroom_id': teacher.classroom_id
     }}), 200
 
 
