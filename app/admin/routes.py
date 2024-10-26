@@ -55,7 +55,7 @@ def get_students():
         return jsonify({'error':'Unauthorized'}), 403
     
     students = Student.query.all()
-    student_list = [{"id": s.id, "name":s.name, "lastname":s.lastname, "school_number":s.school_number,"tc":s.tc, "grade":s.grade} for s in students]
+    student_list = [{"name":s.name, "lastname":s.lastname, "school_number":s.school_number,"tc":s.tc, "class_id":s.class_id} for s in students]
     
     return jsonify(student_list), 200
 
