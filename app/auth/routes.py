@@ -17,8 +17,9 @@ def studentLogin():
 
     if not student or not check_password_hash(student.password, password) or not student.school_number == school_number:
         return jsonify({'error': 'Invalid credentials'}), 401
-
-    access_token = create_access_token(identity=student.id)
+    
+    additional_claims = {"role": student.role}
+    access_token = create_access_token(identity=student.id, additional_claims=additional_claims)
     
     return jsonify({'access_token': access_token, 'role': student.role}), 200
 
@@ -34,7 +35,8 @@ def login_teacher():
     if not teacher or not check_password_hash(teacher.password, password):
         return {"error": "Invalid credentials"}, 401
     
-    access_token = create_access_token(identity=teacher.id)
+    additional_claims = {"role": teacher.role} 
+    access_token = create_access_token(identity=teacher.id, additional_claims = additional_claims)
 
     return {"message": "Login successful",'access_token': access_token ,"name": teacher.name}, 200
 
@@ -50,6 +52,7 @@ def login_admin():
     if not admin or not check_password_hash(admin.password, password):
         return {"error": "Invalid credentials"}, 401
 
-    access_token = create_access_token(identity=admin.id)
+    additional_claims = {"role": admin.role} 
+    access_token = create_access_token(identity=admin.id, additional_claims = additional_claims)
 
     return {"message": "Login successful", "access_token":access_token ,"name": admin.name}, 200
